@@ -24,3 +24,6 @@ https://packages.microsoft.com/repos/code stable main" \
 | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
 sudo apt update
 sudo apt install -y code
+
+# detect android phone
+sudo apt install android-tools-adb android-tools-fastboot
