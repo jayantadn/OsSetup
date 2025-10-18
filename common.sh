@@ -8,6 +8,7 @@ git config --global user.name "Jayanta Debnath"
 git config --global user.email Jayanta.Dn@gmail.com
 
 # add path
+cp ~/.bashrc ~/.bashrc.orig
 echo "export PATH=$PATH:$HOME/Tools/flutter/bin" >> ~/.bashrc
 
 # setup command prompt
