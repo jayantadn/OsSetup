@@ -9,7 +9,7 @@ git config --global user.email Jayanta.Dn@gmail.com
 
 # add path
 cp ~/.bashrc ~/.bashrc.orig
-echo "export PATH=$PATH:$HOME/Tools/flutter/bin" >> ~/.bashrc
+echo "export PATH=\$PATH:\$HOME/Tools/flutter/bin" >> ~/.bashrc
 
 # setup command prompt
 echo "export PS1='\\[\\e[35m\\][\\A]\\[\\e[0m\\] \\[\\e[34m\\]\\W\\[\\e[0m\\] \\$ '" >> ~/.bashrc
