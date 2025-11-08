@@ -46,3 +46,6 @@ sudo usermod -aG docker $USER
 
 # kdiff3
 sudo apt install -y kdiff3 dolphin-plugins
+
+# other packages
+sudo apt install -y libreoffice
