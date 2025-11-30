@@ -96,20 +96,18 @@ if ! command -v docker &>/dev/null; then
     echo "[*] Installing Docker..."
 
     # Remove any legacy packages (ignore errors if not present)
-    sudo apt remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
+    sudo apt-get remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
 
     # Prerequisites
-    sudo apt update
-    sudo apt install -y ca-certificates curl gnupg lsb-release
+    sudo apt-get update
+    sudo apt-get install -y ca-certificates curl gnupg lsb-release
 
-    # Add Docker’s official GPG key
+    # Add Docker's official GPG key
     if [ ! -d /etc/apt/keyrings ]; then
         sudo install -m 0755 -d /etc/apt/keyrings
     fi
-    if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        sudo chmod a+r /etc/apt/keyrings/docker.gpg
-    fi
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
     # Add the repository (overwrite to ensure correctness)
     UBUNTU_CODENAME="$(lsb_release -cs)"
@@ -118,8 +116,8 @@ if ! command -v docker &>/dev/null; then
         | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
     # Install Docker Engine and related components
-    sudo apt update
-    sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt-get update
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     # Enable and start Docker
     sudo systemctl enable --now docker
