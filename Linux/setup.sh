@@ -14,16 +14,16 @@ fi
 
 ## Common for WSL and native
 cd "$ROOTDIR" || exit
-source "$ROOTDIR/common.sh"
+source "$ROOTDIR/auto/common.sh"
 
 ## WSL specific
 if [ "$ubuntu_env" = "wsl" ]; then
     cd "$ROOTDIR" || exit
-    source "$ROOTDIR/wsl.sh"
+    source "$ROOTDIR/auto/wsl.sh"
 fi
 
 ## Native Ubuntu specific
 if [ "$ubuntu_env" = "native" ]; then
     cd "$ROOTDIR" || exit
-    source "$ROOTDIR/native.sh"
+    source "$ROOTDIR/auto/native.sh"
 fi
