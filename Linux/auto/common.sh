@@ -91,7 +91,7 @@ if ! grep -q "ANDROID_HOME" "$HOME/.bashrc"; then
 
 # Android SDK
 export ANDROID_HOME="$SDK_DIR"
-export PATH="\$ANDROID_HOME/cmdline-tools/latest/bin:\$ANDROID_HOME/platform-tools:\$PATH"
+export PATH="\$ANDROID_HOME/cmdline-tools/latest/bin:\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/emulator:\$PATH"
 EOF
 else
     echo "[*] Android environment variables already exist in ~/.bashrc"
@@ -99,11 +99,15 @@ fi
 
 # Set environment for current session
 export ANDROID_HOME="$SDK_DIR"
-export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
 
 # Accept licenses and install platform tools
 yes | sdkmanager --sdk_root="$SDK_DIR" --licenses
-sdkmanager --sdk_root="$SDK_DIR" "platform-tools" "platforms;android-36" "build-tools;28.0.3"
+sdkmanager --sdk_root="$SDK_DIR" "platform-tools" "platforms;android-36" "build-tools;28.0.3" "emulator" "system-images;android-36;google_apis;x86_64"
+
+# Create Android Virtual Device
+echo "[*] Creating Android Virtual Device..."
+echo "no" | avdmanager create avd -n "Pixel_API_36" -k "system-images;android-36;google_apis;x86_64" -d "pixel" --force
 
 # Accept Flutter Android licenses
 yes | flutter doctor --android-licenses
