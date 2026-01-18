@@ -1,9 +1,19 @@
 #!/bin/bash
 
+###########################
+# install standard packages
+###########################
+sudo apt update
+sudo apt install -y vlc usb-creator-gtk kdiff3 dolphin-plugins libreoffice
+
+###############
 # timesync fix
+###############
 sudo timedatectl set-timezone Asia/Kolkata
 
+###########################
 # set grub timeout as 3s
+###########################
 GRUB_CFG_FILE="/etc/default/grub"
 sudo cp "$GRUB_CFG_FILE" "${GRUB_CFG_FILE}.bak.$(date +%Y%m%d%H%M%S)"
 if grep -q "^GRUB_TIMEOUT=" "$GRUB_CFG_FILE"; then
@@ -13,7 +23,9 @@ else
 fi
 sudo update-grub
 
-# insltall vscode
+###########################
+# install vscode
+###########################
 sudo apt install -y wget gpg apt-transport-https software-properties-common
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/packages.microsoft.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] \
@@ -22,13 +34,9 @@ https://packages.microsoft.com/repos/code stable main" \
 sudo apt update
 sudo apt install -y code
 
-# detect android phone
-sudo apt install -y android-tools-adb android-tools-fastboot
-
-# media player
-sudo apt install -y vlc
-
+###########################
 # docker
+###########################
 sudo apt-get remove -y docker docker-engine docker.io containerd runc || true
 sudo apt-get install -y ca-certificates curl gnupg lsb-release
 sudo mkdir -p /etc/apt/keyrings
@@ -44,10 +52,9 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo groupadd docker || true
 sudo usermod -aG docker $USER
 
-# kdiff3
-sudo apt install -y kdiff3 dolphin-plugins
-
+###########################
 # input remapper - for mouse button customization
+###########################
 REPO="sezanzeb/input-remapper"
 WORKDIR="$(mktemp -d)"
 cd "$WORKDIR"
@@ -86,9 +93,6 @@ echo "Cleaning up $WORKDIR"
 rm -rf "$WORKDIR"
 echo "Done. Run 'input-remapper-gtk' or 'input-remapper-control --version' to verify."
 
-
-# other packages
-sudo apt install -y libreoffice
 
 ####################################
 # CopyQ - clipboard manager
