@@ -1,9 +1,19 @@
 #!/bin/bash
 
+###########################
+# install standard packages
+###########################
+sudo apt update
+sudo apt install -y vlc usb-creator-gtk kdiff3 dolphin-plugins libreoffice
+
+###############
 # timesync fix
+###############
 sudo timedatectl set-timezone Asia/Kolkata
 
+###########################
 # set grub timeout as 3s
+###########################
 GRUB_CFG_FILE="/etc/default/grub"
 sudo cp "$GRUB_CFG_FILE" "${GRUB_CFG_FILE}.bak.$(date +%Y%m%d%H%M%S)"
 if grep -q "^GRUB_TIMEOUT=" "$GRUB_CFG_FILE"; then
@@ -64,6 +74,7 @@ elif [ "$PKG_MANAGER" = "dnf" ]; then
 fi
 
 # input remapper - for mouse button customization
+###########################
 REPO="sezanzeb/input-remapper"
 WORKDIR="$(mktemp -d)"
 cd "$WORKDIR"
