@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# Source package manager abstraction
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../auto/pkg_manager.sh"
+
 echo "Hint: During configuration use the name GoogleDrive, which is entry number 18"
 
 # === SETTINGS ===
@@ -9,8 +13,8 @@ RCLONE_REMOTE_NAME="GoogleDrive"
 
 # === STEP 1: Install rclone ===
 echo "[*] Installing rclone..."
-sudo apt update -y
-sudo apt install -y rclone
+pkg_update
+pkg_install rclone
 
 # === STEP 2: Configure rclone if needed ===
 if ! rclone listremotes | grep -q "^${RCLONE_REMOTE_NAME}:"; then
