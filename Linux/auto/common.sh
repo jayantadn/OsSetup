@@ -171,3 +171,4 @@ deactivate
 # install other common tools
 ####################################################
 sudo apt install -y vim
+curl -f https://zed.dev/install.sh | sh
