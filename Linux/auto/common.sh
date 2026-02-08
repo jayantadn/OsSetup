@@ -48,21 +48,21 @@ if [ ! -d "$FLUTTER_DIR" ]; then
     echo "[*] Installing Flutter..."
     mkdir -p "$HOME/Tools"
     cd "$HOME/Tools"
-    
+
     # Download Flutter
     git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION "$FLUTTER_DIR"
-    
+
     # Add Flutter to PATH for current session
     export PATH="$PATH:$FLUTTER_DIR/bin"
-    
+
     # Add Flutter to bashrc if not already present
     if ! grep -q "export PATH=.*\$HOME/Tools/flutter/bin" ~/.bashrc; then
         echo "export PATH=\$PATH:\$HOME/Tools/flutter/bin" >> ~/.bashrc
     fi
-    
+
     # Run flutter doctor to download Dart SDK and other dependencies
     flutter doctor
-    
+
     echo "[*] Flutter installation complete."
 else
     echo "[*] Flutter already installed at $FLUTTER_DIR"
@@ -168,7 +168,19 @@ pip install -r $SCRIPTS_DIR/requirements.txt
 deactivate
 
 ####################################################
+# install zed editor
+####################################################
+curl -f https://zed.dev/install.sh | sh
+if ! printf '%s\n' "$PATH" | tr ':' '\n' | grep -qx "$HOME/.local/bin"; then
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+fi
+
+# apply for current shell
+export PATH="$HOME/.local/bin:$PATH"
+
+
+
+####################################################
 # install other common tools
 ####################################################
 sudo apt install -y vim
-curl -f https://zed.dev/install.sh | sh
