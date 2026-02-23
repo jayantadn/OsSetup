@@ -1,5 +1,12 @@
 #!/bin/bash
 
+## Prompt for sudo access at the beginning
+echo "This script requires sudo privileges. Please enter your password:"
+sudo -v
+
+## Keep sudo alive in the background
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 ## Store the current directory at the beginning
 ROOTDIR="$(pwd)"
 
