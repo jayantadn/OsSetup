@@ -4,7 +4,7 @@
 # initial steps
 ####################################################
 
-pkg_update_upgrade
+sudo apt update && sudo apt upgrade -y
 
 # git configure
 git config --global user.name "Jayanta Debnath"
@@ -22,7 +22,7 @@ fi
 # install python
 ####################################################
 PYTHON_VERSION=3.10.13
-pkg_install_mapped make build-essential libssl-dev zlib1g-dev libbz2-dev \
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils \
 tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 cd /usr/src
@@ -78,7 +78,7 @@ TOOLS_ZIP="commandlinetools-linux.zip"
 SDK_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
 
 echo "[*] Installing Android SDK..."
-pkg_install_mapped unzip curl openjdk-17-jdk
+sudo apt install -y unzip curl openjdk-17-jdk
 mkdir -p "$SDK_DIR/cmdline-tools"
 curl -o "$TOOLS_ZIP" "$SDK_URL"
 unzip -q "$TOOLS_ZIP" -d "$SDK_DIR/cmdline-tools"
@@ -117,35 +117,24 @@ echo "[*] Android SDK installation complete."
 ####################################################
 # install node and firebase cli
 ####################################################
-pkg_install_mapped curl software-properties-common
-if [ "$PKG_MANAGER" = "apt" ]; then
-    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo bash -
-    pkg_install nodejs
-elif [ "$PKG_MANAGER" = "dnf" ]; then
-    # For Fedora, use the default Node.js from repos or NodeSource
-    pkg_install nodejs npm
-fi
+sudo apt install -y curl software-properties-common
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo bash -
+sudo apt install -y nodejs
 sudo npm install -g firebase-tools
 dart pub global activate flutterfire_cli
 
 ####################################################
 # install google chrome
 ####################################################
-pkg_install_mapped wget curl apt-transport-https gnupg
-if [ "$PKG_MANAGER" = "apt" ]; then
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/google-chrome-stable_current_amd64.deb
-    pkg_install_local /tmp/google-chrome-stable_current_amd64.deb
-    rm /tmp/google-chrome-stable_current_amd64.deb
-elif [ "$PKG_MANAGER" = "dnf" ]; then
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm -O /tmp/google-chrome-stable_current_x86_64.rpm
-    pkg_install_local /tmp/google-chrome-stable_current_x86_64.rpm
-    rm /tmp/google-chrome-stable_current_x86_64.rpm
-fi
+sudo apt install -y wget curl apt-transport-https gnupg
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/google-chrome-stable_current_amd64.deb
+sudo apt install -y /tmp/google-chrome-stable_current_amd64.deb
+rm /tmp/google-chrome-stable_current_amd64.deb
 
 ####################################################
 # install qemu
 ####################################################
-pkg_install_mapped qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager
+sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager
 sudo usermod -aG libvirt $USER
 sudo usermod -aG kvm $USER
 sudo systemctl enable --now libvirtd

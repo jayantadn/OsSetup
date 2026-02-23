@@ -10,10 +10,6 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 ## Store the current directory at the beginning
 ROOTDIR="$(pwd)"
 
-## Source package manager abstraction layer
-cd "$ROOTDIR" || exit
-source "$ROOTDIR/auto/pkg_manager.sh"
-
 ## Detect if running on WSL or native Linux
 if grep -qi microsoft /proc/version; then
     linux_env="wsl"

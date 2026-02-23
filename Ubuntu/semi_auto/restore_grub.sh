@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-# Source package manager abstraction
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../auto/pkg_manager.sh"
-
 ####################################################
 # Restore GRUB as Default Bootloader
 # Use this script after Windows installation overwrites the bootloader
@@ -24,7 +20,7 @@ fi
 
 # === STEP 1: Install os-prober (to detect Windows) ===
 echo "[*] Step 1: Ensuring os-prober is installed..."
-pkg_install os-prober
+sudo apt install -y os-prober
 echo "    ✓ os-prober installed"
 echo
 

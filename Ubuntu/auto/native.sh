@@ -24,54 +24,40 @@ fi
 sudo update-grub
 
 # install vscode
-pkg_install_mapped wget gpg apt-transport-https software-properties-common
-if [ "$PKG_MANAGER" = "apt" ]; then
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/packages.microsoft.gpg
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] \
+sudo apt install -y wget gpg apt-transport-https software-properties-common
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/packages.microsoft.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] \
 https://packages.microsoft.com/repos/code stable main" \
 | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
-    pkg_update
-    pkg_install code
-elif [ "$PKG_MANAGER" = "dnf" ]; then
-    sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-    sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
-    pkg_install code
-fi
+sudo apt update
+sudo apt install -y code
 
 # detect android phone
-pkg_install_mapped android-tools-adb android-tools-fastboot
+sudo apt install -y android-tools-adb android-tools-fastboot
 
 # media player
-pkg_install vlc
+sudo apt install -y vlc
 
 # docker
-pkg_remove docker docker-engine docker.io containerd runc || true
-pkg_install_mapped ca-certificates curl gnupg lsb-release
-if [ "$PKG_MANAGER" = "apt" ]; then
-    sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-      sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    echo \
-      "deb [arch=$(get_arch) signed-by=/etc/apt/keyrings/docker.gpg] \
-      https://download.docker.com/linux/ubuntu \
-      $(get_codename) stable" | \
-      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    pkg_update
-    pkg_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-elif [ "$PKG_MANAGER" = "dnf" ]; then
-    sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-    pkg_install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    sudo systemctl enable --now docker
-fi
+sudo apt remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
+sudo apt install -y ca-certificates curl gnupg lsb-release
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+UBUNTU_CODENAME=$(lsb_release -cs)
+ARCH=$(dpkg --print-architecture)
+echo \
+  "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  ${UBUNTU_CODENAME} stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo groupadd docker || true
 sudo usermod -aG docker $USER
 
 # kdiff3
-if [ "$PKG_MANAGER" = "apt" ]; then
-    pkg_install kdiff3 dolphin-plugins
-elif [ "$PKG_MANAGER" = "dnf" ]; then
-    pkg_install kdiff3
-fi
+sudo apt install -y kdiff3 dolphin-plugins
 
 # input remapper - for mouse button customization
 ###########################
@@ -81,8 +67,8 @@ cd "$WORKDIR"
 for cmd in curl jq; do
   if ! command -v $cmd >/dev/null 2>&1; then
     echo "Installing missing dependency: $cmd"
-    pkg_update
-    pkg_install "$cmd"
+    sudo apt update
+    sudo apt install -y "$cmd"
   fi
 done
 echo "Fetching latest release info for $REPO..."
@@ -96,11 +82,11 @@ debname="$(basename "$asset_url")"
 echo "Downloading asset: $debname"
 curl -L -o "$debname" "$asset_url"
 echo "Installing $debname (may ask for sudo)..."
-if pkg_install_local "./$debname"; then
+if sudo apt install -y "./$debname"; then
   echo "Package installed successfully."
 else
   echo "Package install failed; trying to fix dependencies..."
-  pkg_fix_dependencies
+  sudo apt install -f -y
   sudo dpkg -i "./$debname" || { echo "dpkg failed"; exit 2; }
 fi
 if systemctl list-unit-files --type=service 2>/dev/null | grep -q '^input-remapper'; then
@@ -113,9 +99,8 @@ echo "Cleaning up $WORKDIR"
 rm -rf "$WORKDIR"
 echo "Done. Run 'input-remapper-gtk' or 'input-remapper-control --version' to verify."
 
-
 # other packages
-pkg_install_mapped libreoffice
+sudo apt install -y libreoffice
 
 ####################################
 # CopyQ - clipboard manager
@@ -127,7 +112,7 @@ cd "$WORKDIR"
 for cmd in curl; do
   if ! command -v $cmd >/dev/null 2>&1; then
     echo "Installing missing dependency: $cmd"
-    pkg_install "$cmd"
+    sudo apt install -y "$cmd"
   fi
 done
 echo "Fetching latest release info for $REPO..."
@@ -156,11 +141,11 @@ debname="$(basename "$asset_url")"
 echo "Downloading asset: $debname"
 curl -L -o "$debname" "$asset_url"
 echo "Installing $debname (may ask for sudo)..."
-if pkg_install_local "./$debname"; then
+if sudo apt install -y "./$debname"; then
   echo "Package installed successfully."
 else
   echo "Package install failed; trying to fix dependencies..."
-  pkg_fix_dependencies
+  sudo apt install -f -y
   sudo dpkg -i "./$debname" || { echo "dpkg failed"; exit 2; }
 fi
 echo "Cleaning up $WORKDIR"

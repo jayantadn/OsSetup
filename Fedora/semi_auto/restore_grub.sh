@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-# Source package manager abstraction
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../auto/pkg_manager.sh"
-
 ####################################################
 # Restore GRUB as Default Bootloader
 # Use this script after Windows installation overwrites the bootloader
@@ -24,7 +20,7 @@ fi
 
 # === STEP 1: Install os-prober (to detect Windows) ===
 echo "[*] Step 1: Ensuring os-prober is installed..."
-pkg_install os-prober
+sudo dnf install -y os-prober
 echo "    ✓ os-prober installed"
 echo
 
@@ -53,17 +49,12 @@ echo "[*] Step 3: Updating GRUB configuration..."
 echo "    This will scan for Windows and other operating systems..."
 
 # Fedora uses different commands for GRUB update
-if [ "$PKG_MANAGER" = "dnf" ]; then
-    # For UEFI systems
-    if [ -d /sys/firmware/efi ]; then
-        grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
-    else
-        # For BIOS systems
-        grub2-mkconfig -o /boot/grub2/grub.cfg
-    fi
+# For UEFI systems
+if [ -d /sys/firmware/efi ]; then
+    grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg
 else
-    # Ubuntu/Debian
-    update-grub
+    # For BIOS systems
+    grub2-mkconfig -o /boot/grub2/grub.cfg
 fi
 echo
 
@@ -103,20 +94,10 @@ WINDOWS_BOOTMGR="$EFI_MOUNT/EFI/Microsoft/Boot/bootmgfw.efi"
 WINDOWS_BACKUP="$EFI_MOUNT/EFI/Microsoft/Boot/bootmgfw.efi.backup"
 
 # Find GRUB bootloader (Fedora uses different paths)
-if [ "$PKG_MANAGER" = "dnf" ]; then
-    # Fedora GRUB locations
-    if [ -f "$EFI_MOUNT/EFI/fedora/shimx64.efi" ]; then
-        GRUB_BOOTLOADER="$EFI_MOUNT/EFI/fedora/shimx64.efi"
-    elif [ -f "$EFI_MOUNT/EFI/fedora/grubx64.efi" ]; then
-        GRUB_BOOTLOADER="$EFI_MOUNT/EFI/fedora/grubx64.efi"
-    fi
-else
-    # Ubuntu GRUB locations
-    if [ -f "$EFI_MOUNT/EFI/ubuntu/shimx64.efi" ]; then
-        GRUB_BOOTLOADER="$EFI_MOUNT/EFI/ubuntu/shimx64.efi"
-    elif [ -f "$EFI_MOUNT/EFI/ubuntu/grubx64.efi" ]; then
-        GRUB_BOOTLOADER="$EFI_MOUNT/EFI/ubuntu/grubx64.efi"
-    fi
+if [ -f "$EFI_MOUNT/EFI/fedora/shimx64.efi" ]; then
+    GRUB_BOOTLOADER="$EFI_MOUNT/EFI/fedora/shimx64.efi"
+elif [ -f "$EFI_MOUNT/EFI/fedora/grubx64.efi" ]; then
+    GRUB_BOOTLOADER="$EFI_MOUNT/EFI/fedora/grubx64.efi"
 fi
 
 # Check if files exist
