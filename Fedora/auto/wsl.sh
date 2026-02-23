@@ -3,7 +3,9 @@
 echo "Running WSL-specific setup..."
 
 # install thunar filemanager
-sudo dnf install -y thunar file-roller p7zip p7zip-plugins xfce4-terminal xterm
+if ! sudo dnf install -y thunar file-roller p7zip p7zip-plugins xfce4-terminal xterm; then
+    track_failure "Thunar and file manager tools installation"
+fi
 
 # install other GUI tools
-sudo dnf install -y gedit
+sudo dnf install -y gedit || track_failure "Gedit installation"
