@@ -22,20 +22,64 @@ fi
 # install python
 ####################################################
 (
-    PYTHON_VERSION=3.10.13
-    sudo dnf install -y make gcc gcc-c++ openssl-devel zlib-devel bzip2-devel \
-    readline-devel sqlite-devel wget curl llvm ncurses-devel xz-utils \
-    tk-devel libxml2-devel xmlsec1-devel libffi-devel xz-devel
-    cd /usr/src
-    sudo wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz
-    sudo tar xvf Python-${PYTHON_VERSION}.tgz
-    sudo rm Python-${PYTHON_VERSION}.tgz
-    cd Python-${PYTHON_VERSION}
-    sudo ./configure --enable-optimizations
-    sudo make -j"$(nproc)"
-    sudo make altinstall
-    cd /usr/src
-    sudo rm -rf Python-${PYTHON_VERSION}
+PYTHON_VERSION="3.10.14"
+PREFIX="/usr/local"
+SRC_DIR="/usr/src"
+BUILD_DIR="${SRC_DIR}/Python-${PYTHON_VERSION}"
+TARBALL="Python-${PYTHON_VERSION}.tgz"
+URL="https://www.python.org/ftp/python/${PYTHON_VERSION}/${TARBALL}"
+
+echo "==> Installing build dependencies..."
+
+sudo dnf install -y \
+    gcc \
+    gcc-c++ \
+    make \
+    openssl-devel \
+    bzip2-devel \
+    libffi-devel \
+    zlib-devel \
+    readline-devel \
+    sqlite-devel \
+    tk-devel \
+    xz-devel \
+    gdbm-devel \
+    ncurses-devel \
+    libuuid-devel \
+    libnsl2-devel \
+    wget \
+    tar
+
+echo "==> Downloading Python ${PYTHON_VERSION}..."
+sudo mkdir -p "${SRC_DIR}"
+cd "${SRC_DIR}"
+
+if [ ! -f "${TARBALL}" ]; then
+    sudo wget "${URL}"
+fi
+
+echo "==> Extracting..."
+sudo tar -xzf "${TARBALL}"
+
+cd "${BUILD_DIR}"
+
+echo "==> Configuring build..."
+sudo ./configure \
+    --enable-optimizations \
+    --with-lto \
+    --prefix="${PREFIX}"
+
+echo "==> Building (this will take a while)..."
+sudo make -j"$(nproc)"
+
+echo "==> Installing (altinstall, safe for system Python)..."
+sudo make altinstall
+
+echo "==> Verifying installation..."
+${PREFIX}/bin/python3.10 --version
+
+echo "==> Done."
+echo "Binary location: ${PREFIX}/bin/python3.10"
 )
 
 
