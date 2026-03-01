@@ -1,26 +1,10 @@
 #!/bin/bash
 
 ####################################################
-# Helper function to run commands with error tracking
-####################################################
-run_with_tracking() {
-    local step_name="$1"
-    shift
-    echo "[*] Running: $step_name"
-    if ! "$@"; then
-        echo "[✗] Failed: $step_name"
-        track_failure "$step_name"
-        return 1
-    fi
-    echo "[✓] Success: $step_name"
-    return 0
-}
-
-####################################################
 # initial steps
 ####################################################
 
-sudo apt update && sudo apt upgrade -y || track_failure "APT system upgrade"
+sudo apt update && sudo apt upgrade -y
 
 # git configure
 git config --global user.name "Jayanta Debnath"
@@ -37,7 +21,7 @@ fi
 ####################################################
 # install python
 ####################################################
-if ! (
+(
     PYTHON_VERSION=3.10.13
     sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
     libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils \
@@ -52,9 +36,7 @@ if ! (
     sudo make altinstall
     cd /usr/src
     sudo rm -rf Python-${PYTHON_VERSION}
-); then
-    track_failure "Python ${PYTHON_VERSION} installation"
-fi
+)
 
 
 ####################################################
@@ -66,7 +48,7 @@ FLUTTER_DIR="$HOME/Tools/flutter"
 
 if [ ! -d "$FLUTTER_DIR" ]; then
     echo "[*] Installing Flutter..."
-    if (
+    (
         mkdir -p "$HOME/Tools"
         cd "$HOME/Tools"
 
@@ -85,11 +67,7 @@ if [ ! -d "$FLUTTER_DIR" ]; then
         flutter doctor
 
         echo "[*] Flutter installation complete."
-    ); then
-        echo "[✓] Flutter installation successful"
-    else
-        track_failure "Flutter installation"
-    fi
+    )
 else
     echo "[*] Flutter already installed at $FLUTTER_DIR"
     export PATH="$PATH:$FLUTTER_DIR/bin"
@@ -99,7 +77,7 @@ fi
 ####################################################
 # install android sdk
 ####################################################
-if ! (
+(
     SDK_DIR="$HOME/Tools/android-sdk"
     TOOLS_ZIP="commandlinetools-linux.zip"
     SDK_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
@@ -140,51 +118,43 @@ EOF
     yes | flutter doctor --android-licenses
 
     echo "[*] Android SDK installation complete."
-); then
-    track_failure "Android SDK installation"
-fi
+)
 
 ####################################################
 # install node and firebase cli
 ####################################################
-if ! (
+(
     sudo apt install -y curl software-properties-common &&
     curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo bash - &&
     sudo apt install -y nodejs &&
     sudo npm install -g firebase-tools &&
     dart pub global activate flutterfire_cli
-); then
-    track_failure "Node.js and Firebase CLI installation"
-fi
+)
 
 ####################################################
 # install google chrome
 ####################################################
-if ! (
+(
     sudo apt install -y wget curl apt-transport-https gnupg &&
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/google-chrome-stable_current_amd64.deb &&
     sudo apt install -y /tmp/google-chrome-stable_current_amd64.deb &&
     rm /tmp/google-chrome-stable_current_amd64.deb
-); then
-    track_failure "Google Chrome installation"
-fi
+)
 
 ####################################################
 # install qemu
 ####################################################
-if ! (
+(
     sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager &&
     sudo usermod -aG libvirt $USER &&
     sudo usermod -aG kvm $USER &&
     sudo systemctl enable --now libvirtd
-); then
-    track_failure "QEMU/KVM installation"
-fi
+)
 
 ####################################################
 # setup Scripts from OsSetup repo
 ####################################################
-if ! (
+(
     mkdir -p $HOME/GitRepos
     if [ ! -d "$HOME/GitRepos/OsSetup" ]; then
         echo "[*] Cloning OsSetup repo..."
@@ -198,27 +168,23 @@ if ! (
     source $SCRIPTS_DIR/.venv/bin/activate
     pip install -r $SCRIPTS_DIR/requirements.txt
     deactivate
-); then
-    track_failure "Scripts setup from OsSetup repo"
-fi
+)
 
 ####################################################
 # install zed editor
 ####################################################
-if ! (
+(
     curl -f https://zed.dev/install.sh | sh &&
     if ! printf '%s\n' "$PATH" | tr ':' '\n' | grep -qx "$HOME/.local/bin"; then
       echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
     fi &&
     # apply for current shell
     export PATH="$HOME/.local/bin:$PATH"
-); then
-    track_failure "Zed editor installation"
-fi
+)
 
 
 
 ####################################################
 # install other common tools
 ####################################################
-sudo apt install -y vim || track_failure "Vim installation"
+sudo apt install -y vim

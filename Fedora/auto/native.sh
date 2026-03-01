@@ -3,18 +3,18 @@
 ###########################
 # install standard packages
 ###########################
-sudo dnf update -y || track_failure "DNF update"
-sudo dnf install -y vlc kdiff3 dolphin libreoffice || track_failure "Standard packages installation"
+sudo dnf update -y
+sudo dnf install -y vlc kdiff3 dolphin libreoffice
 
 ###############
 # timesync fix
 ###############
-sudo timedatectl set-timezone Asia/Kolkata || track_failure "Timezone configuration"
+sudo timedatectl set-timezone Asia/Kolkata
 
 ###########################
 # set grub timeout as 3s
 ###########################
-if ! (
+(
     GRUB_CFG_FILE="/etc/default/grub"
     sudo cp "$GRUB_CFG_FILE" "${GRUB_CFG_FILE}.bak.$(date +%Y%m%d%H%M%S)"
     if grep -q "^GRUB_TIMEOUT=" "$GRUB_CFG_FILE"; then
@@ -23,28 +23,24 @@ if ! (
         echo "GRUB_TIMEOUT=3" | sudo tee -a "$GRUB_CFG_FILE" > /dev/null
     fi
     sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-); then
-    track_failure "GRUB timeout configuration"
-fi
+)
 
 # install vscode
-if ! (
+(
     sudo dnf install -y wget gnupg2 dnf-plugins-core &&
     sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc &&
     sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' &&
     sudo dnf install -y code
-); then
-    track_failure "VS Code installation"
-fi
+)
 
 # detect android phone
-sudo dnf install -y android-tools || track_failure "Android tools installation"
+sudo dnf install -y android-tools
 
 # media player
-sudo dnf install -y vlc || track_failure "VLC installation"
+sudo dnf install -y vlc
 
 # docker
-if ! (
+(
     sudo dnf remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
     sudo dnf install -y ca-certificates curl gnupg2 redhat-lsb-core &&
     sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo &&
@@ -52,16 +48,14 @@ if ! (
     sudo systemctl enable --now docker &&
     sudo groupadd docker || true &&
     sudo usermod -aG docker $USER
-); then
-    track_failure "Docker installation"
-fi
+)
 
 # kdiff3
-sudo dnf install -y kdiff3 || track_failure "KDiff3 installation"
+sudo dnf install -y kdiff3
 
 # input remapper - for mouse button customization
 ###########################
-if ! (
+(
     REPO="sezanzeb/input-remapper"
     WORKDIR="$(mktemp -d)"
     cd "$WORKDIR"
@@ -94,7 +88,7 @@ if ! (
         echo "Downloading asset: $pkgname"
         curl -L -o "$pkgname" "$asset_url"
         echo "Installing $pkgname (may ask for sudo)..."
-        
+
         if [[ "$pkgname" == *.rpm ]]; then
             if sudo dnf install -y "./$pkgname"; then
                 echo "Package installed successfully."
@@ -109,7 +103,7 @@ if ! (
             rpmname="${pkgname%.deb}*.rpm"
             sudo rpm -i $rpmname || exit 1
         fi
-        
+
         if systemctl list-unit-files --type=service 2>/dev/null | grep -q '^input-remapper'; then
           echo "Enabling and starting input-remapper service..."
           sudo systemctl enable --now input-remapper.service || echo "Could not enable/start input-remapper.service — check logs."
@@ -120,18 +114,16 @@ if ! (
     echo "Cleaning up $WORKDIR"
     rm -rf "$WORKDIR"
     echo "Done. Run 'input-remapper-gtk' or 'input-remapper-control --version' to verify."
-); then
-    track_failure "Input Remapper installation"
-fi
+)
 
 # other packages
-sudo dnf install -y libreoffice || track_failure "LibreOffice installation"
+sudo dnf install -y libreoffice
 
 ####################################
 # CopyQ - clipboard manager
 # https://github.com/hluk/CopyQ
 ####################################
-if ! (
+(
     REPO="hluk/CopyQ"
     WORKDIR="$(mktemp -d)"
     cd "$WORKDIR"
@@ -172,6 +164,4 @@ if ! (
     echo "Cleaning up $WORKDIR"
     rm -rf "$WORKDIR"
     echo "Done. Run 'copyq' to launch CopyQ."
-); then
-    track_failure "CopyQ installation"
-fi
+)

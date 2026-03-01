@@ -3,18 +3,18 @@
 ###########################
 # install standard packages
 ###########################
-sudo apt update || track_failure "APT update"
-sudo apt install -y vlc usb-creator-gtk kdiff3 dolphin-plugins libreoffice || track_failure "Standard packages installation"
+sudo apt update
+sudo apt install -y vlc usb-creator-gtk kdiff3 dolphin-plugins libreoffice
 
 ###############
 # timesync fix
 ###############
-sudo timedatectl set-timezone Asia/Kolkata || track_failure "Timezone configuration"
+sudo timedatectl set-timezone Asia/Kolkata
 
 ###########################
 # set grub timeout as 3s
 ###########################
-if ! (
+(
     GRUB_CFG_FILE="/etc/default/grub"
     sudo cp "$GRUB_CFG_FILE" "${GRUB_CFG_FILE}.bak.$(date +%Y%m%d%H%M%S)"
     if grep -q "^GRUB_TIMEOUT=" "$GRUB_CFG_FILE"; then
@@ -23,12 +23,10 @@ if ! (
         echo "GRUB_TIMEOUT=3" | sudo tee -a "$GRUB_CFG_FILE" > /dev/null
     fi
     sudo update-grub
-); then
-    track_failure "GRUB timeout configuration"
-fi
+)
 
 # install vscode
-if ! (
+(
     sudo apt install -y wget gpg apt-transport-https software-properties-common &&
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/packages.microsoft.gpg &&
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] \
@@ -36,18 +34,16 @@ https://packages.microsoft.com/repos/code stable main" \
 | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null &&
     sudo apt update &&
     sudo apt install -y code
-); then
-    track_failure "VS Code installation"
-fi
+)
 
 # detect android phone
-sudo apt install -y android-tools-adb android-tools-fastboot || track_failure "Android tools installation"
+sudo apt install -y android-tools-adb android-tools-fastboot
 
 # media player
-sudo apt install -y vlc || track_failure "VLC installation"
+sudo apt install -y vlc
 
 # docker
-if ! (
+(
     sudo apt remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
     sudo apt install -y ca-certificates curl gnupg lsb-release &&
     sudo mkdir -p /etc/apt/keyrings &&
@@ -64,16 +60,14 @@ if ! (
     sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin &&
     sudo groupadd docker || true &&
     sudo usermod -aG docker $USER
-); then
-    track_failure "Docker installation"
-fi
+)
 
 # kdiff3
-sudo apt install -y kdiff3 dolphin-plugins || track_failure "KDiff3 and Dolphin plugins installation"
+sudo apt install -y kdiff3 dolphin-plugins
 
 # input remapper - for mouse button customization
 ###########################
-if ! (
+(
     REPO="sezanzeb/input-remapper"
     WORKDIR="$(mktemp -d)"
     cd "$WORKDIR"
@@ -111,18 +105,16 @@ if ! (
     echo "Cleaning up $WORKDIR"
     rm -rf "$WORKDIR"
     echo "Done. Run 'input-remapper-gtk' or 'input-remapper-control --version' to verify."
-); then
-    track_failure "Input Remapper installation"
-fi
+)
 
 # other packages
-sudo apt install -y libreoffice || track_failure "LibreOffice installation"
+sudo apt install -y libreoffice
 
 ####################################
 # CopyQ - clipboard manager
 # https://github.com/hluk/CopyQ
 ####################################
-if ! (
+(
     REPO="hluk/CopyQ"
     WORKDIR="$(mktemp -d)"
     cd "$WORKDIR"
@@ -168,7 +160,5 @@ if ! (
     echo "Cleaning up $WORKDIR"
     rm -rf "$WORKDIR"
     echo "Done. Run 'copyq' to launch CopyQ."
-); then
-    track_failure "CopyQ installation"
-fi
+)
 
