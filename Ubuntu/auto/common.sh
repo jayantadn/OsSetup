@@ -171,20 +171,6 @@ EOF
 )
 
 ####################################################
-# install zed editor
-####################################################
-(
-    curl -f https://zed.dev/install.sh | sh &&
-    if ! printf '%s\n' "$PATH" | tr ':' '\n' | grep -qx "$HOME/.local/bin"; then
-      echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-    fi &&
-    # apply for current shell
-    export PATH="$HOME/.local/bin:$PATH"
-)
-
-
-
-####################################################
 # install other common tools
 ####################################################
 sudo apt install -y vim
