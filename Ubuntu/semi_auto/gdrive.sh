@@ -73,3 +73,4 @@ echo "To check status: systemctl --user status rclone-gdrive"
 echo "To stop:         systemctl --user stop rclone-gdrive"
 echo "To disable:      systemctl --user disable rclone-gdrive"
 
+echo "To reauthenticate: rclone config reconnect GoogleDrive:"
