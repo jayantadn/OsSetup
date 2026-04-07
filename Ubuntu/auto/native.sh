@@ -107,6 +107,22 @@ sudo apt install -y kdiff3 dolphin-plugins
     echo "Done. Run 'input-remapper-gtk' or 'input-remapper-control --version' to verify."
 )
 
+# autoload saved presets at login
+(
+    AUTOSTART_DIR="$HOME/.config/autostart"
+    mkdir -p "$AUTOSTART_DIR"
+    cat > "$AUTOSTART_DIR/input-remapper-autoload.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Input Remapper Autoload
+Exec=input-remapper-control --command autoload
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+EOF
+    echo "Input Remapper autostart entry created at $AUTOSTART_DIR/input-remapper-autoload.desktop"
+)
+
 # other packages
 sudo apt install -y libreoffice
 
