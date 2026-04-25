@@ -1,0 +1,7 @@
+- deploy to home laptop
+- deploy to office laptop
+	- copy Scripts to C:\Tools folder
+	- modify path inside scripts e.g. 7z.exe path
+	- modify FreeCommander settings
+- put the latest FreeCommander.fav.ini file into delivery
+- github create release
